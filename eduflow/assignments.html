@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignments - EduFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'DM Sans', sans-serif; }
+    .bg-grid {
+      background-image: 
+        linear-gradient(rgba(139, 92, 246, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 bg-grid">
+  <div class="flex">
+    <aside id="sidebar" class="w-72 min-h-screen bg-slate-900/50 backdrop-blur-xl border-r border-slate-800 flex flex-col sticky top-0 h-screen"></aside>
+
+    <main class="flex-1 p-8">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">Assignments</h1>
+        <p class="text-slate-400">Track and manage your learning tasks.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-white" id="totalCount">0</p>
+              <p class="text-slate-400 text-sm">Total Tasks</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-white" id="pendingCount">0</p>
+              <p class="text-slate-400 text-sm">Pending</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-white" id="completedCount">0</p>
+              <p class="text-slate-400 text-sm">Completed</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3 mb-6">
+        <button id="filterAll" onclick="filterAssignments('all')" class="px-5 py-2.5 rounded-xl font-medium text-sm bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/25">
+          All Tasks
+        </button>
+        <button id="filterPending" onclick="filterAssignments('pending')" class="px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+          Pending
+        </button>
+        <button id="filterCompleted" onclick="filterAssignments('completed')" class="px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+          Completed
+        </button>
+      </div>
+
+      <div id="loading" class="space-y-4">
+        <div class="animate-pulse bg-slate-900/50 rounded-2xl h-20"></div>
+        <div class="animate-pulse bg-slate-900/50 rounded-2xl h-20"></div>
+        <div class="animate-pulse bg-slate-900/50 rounded-2xl h-20"></div>
+      </div>
+
+      <ul id="todoList" class="hidden space-y-4"></ul>
+
+      <div id="emptyState" class="hidden text-center py-16">
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-slate-800/50 flex items-center justify-center">
+          <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <p id="emptyText" class="text-slate-400 text-lg">No assignments found.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/components.js"></script>
+  <script src="js/assignments.js"></script>
+  <script src="js/guard.js"></script>
+</body>
+</html>
